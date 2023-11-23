@@ -5,10 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tetris game</title>
     <link rel="stylesheet" href="dist/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap" />
   </head>
   <body>
-    <figure id="action-screen"></figure>
+    <figure id="action_screen"></figure>
 
-    <div id="info-screen"></div>
+    <div id="info_screen">
+      <div id="info_unit">
+        <h1>TETRIS</h1>
+        <br />
+        <div id="current_score">current score: 0</div>
+        <br />
+        <div id="max_score">max score: 999999</div>
+        <br />
+        <div id="lines">lines: 7</div>
+        <br />
+        <div id="level">level: 1</div>
+      </div>
+
+      <div id="next_figure">Next figure</div>
+
+      <div id="control_unit">
+        <button id="play">PLAY</button>
+        <br />
+        <button id="pause">PAUSE</button>
+        <br />
+        <button id="exit">EXIT</button>
+      </div>
+    </div>
   </body>
 </html>
