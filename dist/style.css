@@ -1,3 +1,4 @@
+@charset "UTF-8";
 *,
 *::before,
 *::after {
@@ -22,6 +23,15 @@ body {
   height: 100vh;
   width: 66.666%;
   float: left;
+}
+
+#canvas {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(18, 1fr);
+  gap: 1px;
+  width: 100%;
+  height: 100%;
 }
 
 #info_screen {
@@ -58,4 +68,21 @@ button {
 button:hover {
   background-color: #04af04;
   border-color: #03b803;
+}
+
+.tetromino-cell {
+  background-color: #04af04;
+  border: 1px solid #000000;
+  width: calc(100% / 10);
+  height: calc(100% / 18);
+}
+
+/* Специфичные стили для фигуры L */
+.tetromino-cell.l {
+  background-color: #04af04;
+  /* Зеленый цвет для фигуры */
+}
+
+#canvas .tetromino-cell.l {
+  background-color: #04af04;
 }
