@@ -1,44 +1,72 @@
-document.addEventListener("DOMContentLoaded", function () {
-    var canvas = document.getElementById("canvas");
-    if (!canvas) {
-        console.error("Canvas element not found!");
-        return;
+var figuresArray = ["straight", "square", "T", "L", "skew"];
+var gridColumns = 10;
+var gridRows = 18;
+// const cellSize = Math.min(canvas.width / gridColumns, canvas.height / gridRows);
+var Square = /** @class */ (function () {
+    function Square(x, y) {
+        this.x = x;
+        this.y = y;
     }
-    function createTetromino() {
-        var tetromino = [
-            [1, 0, 0],
-            [1, 1, 1],
-            [0, 0, 0],
-        ];
-        return tetromino;
-    }
-    function drawTetromino(tetromino, startX, startY) {
-        for (var y = 0; y < tetromino.length; y++) {
-            for (var x = 0; x < tetromino[y].length; x++) {
-                if (tetromino[y][x]) {
-                    var cell = document.createElement("div");
-                    cell.className = "tetromino-cell l"; // Добавляем класс "l" для фигуры "L"
-                    cell.style.gridColumn = startX + x + 1;
-                    cell.style.gridRow = startY + y + 1;
-                    canvas.appendChild(cell);
-                }
-            }
+    Square.prototype.moveLeft = function () {
+        if (this.x > 0) {
+            this.x -= 1;
         }
+    };
+    Square.prototype.moveRight = function () {
+        if (this.x + Square.size < gridColumns) {
+            this.x += 1;
+        }
+    };
+    Square.prototype.moveDown = function () {
+        if (this.y + Square.size < gridRows) {
+            this.y += Square.speed;
+        }
+    };
+    Square.prototype.draw = function (ctx, cellSize) {
+        ctx.fillStyle = "blue";
+        var x = this.x * cellSize;
+        var y = this.y * cellSize;
+        ctx.fillRect(x, y, Square.size * cellSize, Square.size * cellSize);
+    };
+    Square.prototype.setSpeed = function (speed) {
+        Square.speed = speed;
+    };
+    Square.size = 2;
+    Square.speed = 0;
+    return Square;
+}());
+var square;
+function handleKeyDown(event) {
+    switch (event.key) {
+        case "ArrowLeft":
+            square.moveLeft();
+            break;
+        case "ArrowRight":
+            square.moveRight();
+            break;
     }
-    function clearCanvas() {
-        var cells = document.querySelectorAll(".tetromino-cell");
-        cells.forEach(function (cell) { return cell.remove(); });
+}
+function setSpeed(speed) {
+    square.setSpeed(speed);
+}
+document.addEventListener("DOMContentLoaded", function () {
+    var canvas = document.querySelector("#canvas");
+    var ctx = canvas === null || canvas === void 0 ? void 0 : canvas.getContext("2d");
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    var gridColumns = 10;
+    var gridRows = 18;
+    var cellSize = Math.min(canvas.width / gridColumns, canvas.height / gridRows);
+    square = new Square(gridColumns / 2 - 1, 0);
+    function animate() {
+        square.moveDown();
+        if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            square.draw(ctx, cellSize);
+        }
+        requestAnimationFrame(animate);
     }
-    function moveTetrominoDown(tetromino, startX, startY) {
-        startY++;
-        clearCanvas();
-        drawTetromino(tetromino, startX, startY);
-    }
-    var tetromino = createTetromino();
-    var startX = 0;
-    var startY = 0;
-    drawTetromino(tetromino, startX, startY);
-    setInterval(function () {
-        moveTetrominoDown(tetromino, startX, startY);
-    }, 1000);
+    document.addEventListener("keydown", handleKeyDown);
+    setSpeed(0.05);
+    animate();
 });

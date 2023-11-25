@@ -11,7 +11,9 @@
   </head>
   <body>
     <figure id="action_screen">
-      <div id="canvas"></div>
+      <div id="canvas-container">
+        <canvas id="canvas">Canvas is not supported</canvas>
+      </div>
     </figure>
 
     <div id="info_screen">
@@ -37,6 +39,6 @@
         <button id="exit">EXIT</button>
       </div>
     </div>
-    <script src="dist/app.js"></script>
+    <script src="dist/app.js" defer></script>
   </body>
 </html>
