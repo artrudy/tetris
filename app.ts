@@ -1,95 +1,35 @@
-const figuresArray: Array<string> = ["straight", "square", "T", "L", "skew"];
-
 const gridColumns = 10;
-const gridRows = 18;
-// const cellSize = Math.min(canvas.width / gridColumns, canvas.height / gridRows);
+const gridRows = 20;
 
-class Square {
-  x: number;
-  y: number;
-  static size: number = 2;
-  static speed: number = 0;
+const vacant = "black";
 
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
+let board: string[][] = [];
 
-  moveLeft() {
-    if (this.x > 0) {
-      this.x -= 1;
-    }
-  }
-
-  moveRight() {
-    if (this.x + Square.size < gridColumns) {
-      this.x += 1;
-    }
-  }
-
-  moveDown() {
-    if (this.y + Square.size < gridRows) {
-      this.y += Square.speed;
-    }
-  }
-
-  draw(ctx: CanvasRenderingContext2D, cellSize: number) {
-    ctx.fillStyle = "blue";
-    const x = this.x * cellSize;
-    const y = this.y * cellSize;
-    ctx.fillRect(x, y, Square.size * cellSize, Square.size * cellSize);
-  }
-
-  setSpeed(speed: number) {
-    Square.speed = speed;
+for (let r = 0; r < gridRows; r += 1) {
+  board[r] = [];
+  for (let c = 0; c < gridColumns; c += 1) {
+    board[r][c] = vacant;
   }
 }
 
-let square: Square;
+const canvas = document.querySelector("#canvas") as HTMLCanvasElement;
+const ctx = canvas?.getContext("2d") as CanvasRenderingContext2D;
 
-function handleKeyDown(event: KeyboardEvent) {
-  switch (event.key) {
-    case "ArrowLeft":
-      square.moveLeft();
-      break;
-    case "ArrowRight":
-      square.moveRight();
-      break;
+const SQ = Math.min(canvas.width / gridColumns, canvas.height / gridRows);
+
+function drawSquare(x, y, color) {
+  ctx.fillStyle = `${color}`;
+  ctx.fillRect(x * SQ, y * SQ, SQ, SQ);
+  ctx.strokeStyle = "black";
+  ctx.strokeRect(x * SQ, y * SQ, SQ, SQ);
+}
+
+function drawBoard() {
+  for (let r = 0; r < gridRows; r += 1) {
+    for (let c = 0; c < gridColumns; c += 1) drawSquare(c, r, board[r][c]);
   }
 }
 
-function setSpeed(speed: number) {
-  square.setSpeed(speed);
-}
+drawBoard();
 
-document.addEventListener("DOMContentLoaded", function () {
-  const canvas = document.querySelector("#canvas") as HTMLCanvasElement;
-  const ctx = canvas?.getContext("2d");
-
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-
-  const gridColumns = 10;
-  const gridRows = 18;
-  const cellSize = Math.min(
-    canvas.width / gridColumns,
-    canvas.height / gridRows
-  );
-
-  square = new Square(gridColumns / 2 - 1, 0);
-
-  function animate() {
-    square.moveDown();
-    if (ctx) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      square.draw(ctx, cellSize);
-    }
-    requestAnimationFrame(animate);
-  }
-
-  document.addEventListener("keydown", handleKeyDown);
-
-  setSpeed(0.05);
-
-  animate();
-});
+drawSquare(0, 6, "blue");
