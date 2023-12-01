@@ -165,6 +165,7 @@ var O = [
         [0, 0, 0, 0],
     ],
 ];
+var Pieces = [Z, S, T, O, I, L, J];
 function Piece(Tetromino) {
     this.tetromino = tetromino;
     this.tetrominoN = 0;
@@ -259,6 +260,8 @@ Piece.prototype.moveLeft = function () {
         this.draw();
     }
     else {
+        this.lock();
+        piece = randomPiece();
     }
 };
 Piece.prototype.moveRight = function () {
@@ -308,5 +311,24 @@ Piece.prototype.rotate = function () {
         this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length;
         this.activeTetromino = this.tetromino[this.tetrominoN];
         this.draw();
+    }
+};
+function randomPiece() {
+    var randomN = Math.floor(Math.random() * Pieces.length);
+    return new Piece(Pieces[randomN]);
+}
+Piece.prototype.lock = function () {
+    for (var r = 0; r < this.activeTetromino.length; r += 1) {
+        for (var c = 0; c < this.activeTetromino.length; c += 1) {
+            if (!this.activeTetromino[r][c]) {
+                continue;
+            }
+            if (this.y + r < 0) {
+                gameOver = true;
+                alert('game over!');
+                break;
+            }
+            board[this.y + r][this.x + c] = color;
+        }
     }
 };

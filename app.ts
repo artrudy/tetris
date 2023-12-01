@@ -6,6 +6,8 @@ const color = "darkgreen";
 
 let board: string[][] = [];
 
+
+
 const Z = [
   [
     [1, 1, 0],
@@ -175,6 +177,10 @@ const O = [
   ],
 ];
 
+const Pieces = [Z, S, T, O, I, L, J];
+
+
+
 function Piece(Tetromino) {
   this.tetromino = tetromino;
   this.tetrominoN = 0;
@@ -284,6 +290,8 @@ Piece.prototype.moveLeft = function () {
   this.x--;
       this.draw();
     } else {
+      this.lock();
+      piece = randomPiece();
     
   }  
 }
@@ -343,4 +351,26 @@ Piece.prototype.rotate = function () {
     this.activeTetromino = this.tetromino[this.tetrominoN];
     this.draw();  
   } 
+}
+
+function randomPiece() {
+  let randomN = Math.floor(Math.random() * Pieces.length);
+
+  return new Piece(Pieces[randomN]);
+}
+
+Piece.prototype.lock = function () {
+  for (let r = 0; r < this.activeTetromino.length; r += 1) {
+    for (let c = 0; c < this.activeTetromino.length; c += 1){
+      if (!this.activeTetromino[r][c]) {
+        continue;
+      }
+      if (this.y + r < 0) {
+        gameOver = true;
+        alert('game over!');
+        break;
+      }
+      board[this.y + r][this.x + c] = color;
+    }
+  }
 }
