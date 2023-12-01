@@ -196,14 +196,117 @@ function drawBoard() {
 }
 drawBoard();
 drawSquare(0, 0, color);
-function drawTetromino() {
-    var piece = J[0];
+// function drawTetromino() {
+//   let piece = J[0];
+//   for (let r = 0; r < piece.length; r += 1) {
+//     for (let c = 0; c < piece.length; c += 1) {
+//       if (piece[r][c]) {
+//         drawSquare(c, r, color);
+//       }
+//     }
+//   }
+// }
+// drawTetromino();
+function draw() {
+    Piece.prototype.draw = function () {
+        for (var r = 0; r < this.activeTetromino.length; r += 1) {
+            for (var c = 0; c < this.activeTetromino[r][c];) {
+                drawSquare(this.x + c, this.y + r, color);
+            }
+        }
+    };
+}
+function unDraw() {
+    Piece.prototype.draw = function () {
+        for (var r = 0; r < this.activeTetromino.length; r += 1) {
+            for (var c = 0; c < this.activeTetromino[r][c];) {
+                drawSquare(this.x + c, this.y + r, 'black');
+            }
+        }
+    };
+}
+document.addEventListener('keydown', control);
+function control(event) {
+    var key = event.key;
+    if (key === "ArrowLeft") {
+        piece.moveLeft();
+    }
+    else if (key === "ArrowUp") {
+        piece.rotate();
+    }
+    else if (key === "ArrowRight") {
+        piece.moveRight();
+    }
+    else if (key === "ArrowDown") {
+        piece.moveDown();
+    }
+}
+Piece.prototype.collision = function (x, y, piece) {
+};
+Piece.prototype.moveDown = function () {
+    if (!this.collision(0, 1, this.activeTetromino)) {
+        this.unDraw();
+        this.y++;
+        this.draw();
+    }
+    else {
+    }
+};
+Piece.prototype.moveLeft = function () {
+    if (!this.collision(-1, 0, this.activeTetromino)) {
+        this.unDraw();
+        this.x--;
+        this.draw();
+    }
+    else {
+    }
+};
+Piece.prototype.moveRight = function () {
+    if (!this.collision(1, 0, this.activeTetromino)) {
+        this.unDraw();
+        this.x++;
+        this.draw();
+    }
+    else {
+    }
+};
+Piece.prototype.collision = function (x, y, piece) {
     for (var r = 0; r < piece.length; r += 1) {
         for (var c = 0; c < piece.length; c += 1) {
-            if (piece[r][c]) {
-                drawSquare(c, r, color);
+            if (!piece[r][c]) {
+                continue;
+            }
+            var newX = this.x + c + x;
+            var newY = this.y + r + y;
+            if (newX < 0 || newX >= gridColumns || newY > gridRows) {
+                return true;
+            }
+            if (newY < 0) {
+                continue;
+            }
+            ;
+            if (board[newY][newX] !== vacant) {
+                return true;
             }
         }
     }
-}
-drawTetromino();
+};
+Piece.prototype.rotate = function () {
+    var nextPattern = this.tetromino[(this.tetrominoN + 1) % this.tetromino.length];
+    var kick = 0;
+    if (this.collision(0, 0, nextPattern)) {
+        if (this.x > gridColumns / 2) {
+            kick = -1;
+        }
+        else {
+            kick = 1;
+        }
+    }
+    if (!this.collision(kick, 0, nextPattern)) {
+        this.unDraw();
+        this.x += kick;
+        this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length;
+        this.activeTetromino = this.tetromino[this.tetrominoN];
+        this.draw();
+    }
+};
