@@ -260,10 +260,15 @@ function control(event: KeyboardEvent) {
 
   if (key === "ArrowLeft") {
     piece.moveLeft();
+    dropStart = Date.now();
   } else if (key === "ArrowUp") {
     piece.rotate();
+    dropStart = Date.now();
+
   } else if (key === "ArrowRight") {
     piece.moveRight();
+    dropStart = Date.now();
+
   } else if (key === "ArrowDown") {
     piece.moveDown();
   }
@@ -374,3 +379,46 @@ Piece.prototype.lock = function () {
     }
   }
 }
+
+function fullRow(){
+  for (let r = 0; r < gridRows; r += 1){
+    let isRowFulll = true;
+    for (let c = 0; c < gridColumns; c += 1){
+      isRowFulll = isRowFulll&&(board[r][c] != vacant)
+    }
+    if (isRowFulll) {
+      for (let y = r; y > 1; y -= 1){
+        for (let c = 0; c < gridColumns; c += 1){
+          board[y][c] = board[y - 1][c];
+        }
+        board[8][10] = board[7][10]
+      }
+      for (let c = 0; c < gridColumns; c += 1){
+        board[0][c] = vacant;
+      }
+      score += 10;
+    }
+  }
+  drawBoard();
+}
+
+
+let dropStart = Date.now();
+
+let gameOver = false;
+  
+  function drop() {
+    let now = Date.now();
+
+    let delta = now - dropStart;
+
+    if (delta > 1000) {
+      piece.moveDown();
+      dropStart = Date.now();
+    }
+    if (!gameOver) {
+      requestAnimationFrame(drop);
+    }
+  }
+
+drop();
