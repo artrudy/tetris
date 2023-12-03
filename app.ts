@@ -8,11 +8,13 @@ const gridRows = 20;
 
 const SQ = canvas.height / gridRows;
 
-console.log(SQ);
-
-const vacant = "white";
+const vacant = "black";
 
 const color = "darkgreen";
+
+let score = 0;
+let lines = 0;
+let maxScore = 0;
 
 function drawSquare(x, y, color) {
   ctx.fillStyle = `${color}`;
@@ -21,7 +23,7 @@ function drawSquare(x, y, color) {
   ctx.strokeRect(x * SQ, y * SQ, SQ, SQ);
 }
 
-drawSquare(1, 1, color);
+// drawSquare(1, 1, color);
 
 let board: string[][] = [];
 
@@ -49,10 +51,10 @@ function Piece(tetromino, color) {
   this.activeTetromino = this.tetromino[this.tetrominoN];
 
   this.x = 2;
-  this.y = 4;
+  this.y = -2;
 }
 
-drawSquare(0, 0, color);
+// drawSquare(0, 0, color);
 
 const Z = [
   [
@@ -235,7 +237,7 @@ const PIECES = [
 
 const Pieces = [Z, S, T, O, I, L, J];
 
-let p = new Piece(PIECES[0][0], PIECES[0][1]);
+let p = randomPiece();
 
 for (let r = 0; r <= gridRows; r += 1) {
   board[r] = [];
@@ -265,16 +267,18 @@ Piece.prototype.unDraw = function () {
 p.draw();
 
 Piece.prototype.moveDown = function () {
-  if (!this.collision()) {
+  if (!this.collision(0, 1, this.activeTetromino)) {
     this.unDraw();
     this.y += 1;
     this.draw();
   } else {
+    this.lock();
+    p = randomPiece();
   }
 };
 
 Piece.prototype.moveRight = function () {
-  if (!this.collision()) {
+  if (!this.collision(1, 0, this.activeTetromino)) {
     this.unDraw();
     this.x++;
     this.draw();
@@ -283,7 +287,7 @@ Piece.prototype.moveRight = function () {
 };
 
 Piece.prototype.moveLeft = function () {
-  if (!this.collision()) {
+  if (!this.collision(-1, 0, this.activeTetromino)) {
     this.unDraw();
     this.x--;
     this.draw();
@@ -292,8 +296,22 @@ Piece.prototype.moveLeft = function () {
 };
 
 Piece.prototype.rotate = function () {
-  if (!this.collision()) {
+  let nextPattern =
+    this.tetromino[(this.tetrominoN + 1) % this.tetromino.length];
+
+  let kick = 0;
+
+  if (this.collision(0, 0, nextPattern)) {
+    if (this.x > gridColumns / 2) {
+      kick -= 1;
+    } else {
+      kick = 1;
+    }
+  }
+
+  if (!this.collision(0, 0, nextPattern)) {
     this.unDraw();
+    this.x += kick;
     this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length;
     this.activeTetromino = this.tetromino[this.tetrominoN];
     this.draw();
@@ -353,6 +371,7 @@ function control(event: KeyboardEvent): void {
 }
 
 let dropStart = Date.now();
+let gameOver = false;
 
 function drop() {
   let now = Date.now();
@@ -362,52 +381,64 @@ function drop() {
     p.moveDown();
     dropStart = Date.now();
   }
-
-  requestAnimationFrame(drop);
+  if (!gameOver) {
+    requestAnimationFrame(drop);
+  }
 }
 
 drop();
 
-// function randomPiece() {
-//   let randomN = Math.floor(Math.random() * Pieces.length);
+function randomPiece() {
+  let r = Math.floor(Math.random() * PIECES.length);
+  return new Piece(PIECES[r][0], PIECES[r][1]);
+}
 
-//   return new Piece(Pieces[randomN]);
-// }
+Piece.prototype.lock = function () {
+  for (let r = 0; r < this.activeTetromino.length; r += 1) {
+    for (let c = 0; c < this.activeTetromino.length; c += 1) {
+      if (!this.activeTetromino[r][c]) {
+        continue;
+      }
+      if (this.y + r < 0) {
+        gameOver = true;
+        alert("game over!");
+        break;
+      }
+      board[this.y + r][this.x + c] = color;
+    }
+  }
 
-// Piece.prototype.lock = function () {
-//   for (let r = 0; r < this.activeTetromino.length; r += 1) {
-//     for (let c = 0; c < this.activeTetromino.length; c += 1){
-//       if (!this.activeTetromino[r][c]) {
-//         continue;
-//       }
-//       if (this.y + r < 0) {
-//         gameOver = true;
-//         alert('game over!');
-//         break;
-//       }
-//       board[this.y + r][this.x + c] = color;
-//     }
-//   }
-// }
+  for (let r = 0; r < gridRows; r += 1) {
+    let isRowFulll = true;
+    for (let c = 0; c < gridColumns; c += 1) {
+      isRowFulll = isRowFulll && board[r][c] != vacant;
+    }
+    if (isRowFulll) {
+      for (let y = r; y > 1; y -= 1) {
+        for (let c = 0; c < gridColumns; c += 1) {
+          board[y][c] = board[y - 1][c];
+        }
+      }
+      for (let c = 0; c < gridColumns; c += 1) {
+        board[0][c] = vacant;
+      }
+      score += 10;
+      lines += 1;
+      updateInfo();
+    }
+  }
+  drawBoard();
+};
 
-// function fullRow(){
-//   for (let r = 0; r < gridRows; r += 1){
-//     let isRowFulll = true;
-//     for (let c = 0; c < gridColumns; c += 1){
-//       isRowFulll = isRowFulll&&(board[r][c] != vacant)
-//     }
-//     if (isRowFulll) {
-//       for (let y = r; y > 1; y -= 1){
-//         for (let c = 0; c < gridColumns; c += 1){
-//           board[y][c] = board[y - 1][c];
-//         }
-//         board[8][10] = board[7][10]
-//       }
-//       for (let c = 0; c < gridColumns; c += 1){
-//         board[0][c] = vacant;
-//       }
-//       score += 10;
-//     }
-//   }
-//   drawBoard();
-// }
+function updateInfo() {
+  const currentScoreElement = document.getElementById("current_score");
+  const linesElement = document.getElementById("lines");
+
+  if (currentScoreElement) {
+    currentScoreElement.textContent = `current score: ${score}`;
+  }
+
+  if (linesElement) {
+    linesElement.textContent = `lines: ${lines}`;
+  }
+}
