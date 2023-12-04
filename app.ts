@@ -12,9 +12,23 @@ const vacant = "black";
 
 const color = "darkgreen";
 
+let gameOver = false;
+
 let score = 0;
 let lines = 0;
 let maxScore = 0;
+
+let isPaused = false;
+
+function pause() {
+  if (!isPaused) {
+    isPaused = true;
+    console.log(isPaused);
+  } else {
+    isPaused = false;
+    console.log(isPaused);
+  }
+}
 
 function drawSquare(x, y, color) {
   ctx.fillStyle = `${color}`;
@@ -267,31 +281,37 @@ Piece.prototype.unDraw = function () {
 p.draw();
 
 Piece.prototype.moveDown = function () {
-  if (!this.collision(0, 1, this.activeTetromino)) {
-    this.unDraw();
-    this.y += 1;
-    this.draw();
-  } else {
-    this.lock();
-    p = randomPiece();
+  if (!isPaused) {
+    if (!this.collision(0, 1, this.activeTetromino)) {
+      this.unDraw();
+      this.y += 1;
+      this.draw();
+    } else {
+      this.lock();
+      p = randomPiece();
+    }
   }
 };
 
 Piece.prototype.moveRight = function () {
-  if (!this.collision(1, 0, this.activeTetromino)) {
-    this.unDraw();
-    this.x++;
-    this.draw();
-  } else {
+  if (!isPaused) {
+    if (!this.collision(1, 0, this.activeTetromino)) {
+      this.unDraw();
+      this.x++;
+      this.draw();
+    } else {
+    }
   }
 };
 
 Piece.prototype.moveLeft = function () {
-  if (!this.collision(-1, 0, this.activeTetromino)) {
-    this.unDraw();
-    this.x--;
-    this.draw();
-  } else {
+  if (!isPaused) {
+    if (!this.collision(-1, 0, this.activeTetromino)) {
+      this.unDraw();
+      this.x--;
+      this.draw();
+    } else {
+    }
   }
 };
 
@@ -302,19 +322,21 @@ Piece.prototype.rotate = function () {
   let kick = 0;
 
   if (this.collision(0, 0, nextPattern)) {
-    if (this.x > gridColumns / 2) {
-      kick -= 1;
-    } else {
-      kick = 1;
+    if (!isPaused) {
+      if (this.x > gridColumns / 2) {
+        kick -= 1;
+      } else {
+        kick = 1;
+      }
     }
-  }
 
-  if (!this.collision(0, 0, nextPattern)) {
-    this.unDraw();
-    this.x += kick;
-    this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length;
-    this.activeTetromino = this.tetromino[this.tetrominoN];
-    this.draw();
+    if (!this.collision(0, 0, nextPattern)) {
+      this.unDraw();
+      this.x += kick;
+      this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length;
+      this.activeTetromino = this.tetromino[this.tetrominoN];
+      this.draw();
+    }
   }
 };
 
@@ -367,11 +389,35 @@ function control(event: KeyboardEvent): void {
       p.moveDown();
       dropStart = Date.now();
       break;
+    case "Space":
+      pause();
+      break;
+    case "Escape":
+      gameOver = true;
+      endGame();
+      break;
+    case "Enter":
+      newGame();
+      break;
+  }
+}
+
+function endGame() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  drawBoard();
+}
+
+function newGame() {
+  if (gameOver) {
+    score = 0;
+    lines = 0;
+    gameOver = false;
+    location.reload();
   }
 }
 
 let dropStart = Date.now();
-let gameOver = false;
 
 function drop() {
   let now = Date.now();
@@ -424,21 +470,21 @@ Piece.prototype.lock = function () {
       }
       score += 10;
       lines += 1;
-      updateInfo();
+      // updateInfo();
     }
   }
   drawBoard();
 };
 
-function updateInfo() {
-  const currentScoreElement = document.getElementById("current_score");
-  const linesElement = document.getElementById("lines");
+// function updateInfo() {
+//   const currentScoreElement = document.getElementById("current_score");
+//   const linesElement = document.getElementById("lines");
 
-  if (currentScoreElement) {
-    currentScoreElement.textContent = `current score: ${score}`;
-  }
+//   if (currentScoreElement) {
+//     currentScoreElement.textContent = `current score: ${score}`;
+//   }
 
-  if (linesElement) {
-    linesElement.textContent = `lines: ${lines}`;
-  }
-}
+//   if (linesElement) {
+//     linesElement.textContent = `lines: ${lines}`;
+//   }
+// }

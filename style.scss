@@ -60,19 +60,19 @@ body {
   align-items: first baseline;
 }
 
-button {
+.button {
   font: inherit;
   background-color: darkgreen;
   color: #000000;
   padding: 10px 20px;
   margin-bottom: 10px;
   border: 2px solid rgb(1, 46, 1);
-  cursor: pointer;
+  cursor: pointer important;
 }
 
-button:hover {
-  background-color: #04af04;
-  border-color: #03b803;
+.button:hover {
+  background-color: #04af04 !important;
+  border-color: #03b803 !important;
 }
 
 #canvas-container {
