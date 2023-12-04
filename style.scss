@@ -56,23 +56,9 @@ body {
 #control_unit {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-items: first baseline;
-}
-
-.button {
-  font: inherit;
-  background-color: darkgreen;
-  color: #000000;
-  padding: 10px 20px;
-  margin-bottom: 10px;
-  border: 2px solid rgb(1, 46, 1);
-  cursor: pointer important;
-}
-
-.button:hover {
-  background-color: #04af04 !important;
-  border-color: #03b803 !important;
+  align-items: center;
+  justify-content: space-around;
+  margin: 2rem;
 }
 
 #canvas-container {
