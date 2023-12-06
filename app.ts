@@ -18,6 +18,39 @@ let score = 0;
 let lines = 0;
 let maxScore = 0;
 
+interface UserScore {
+  place: number;
+  userName: string;
+  score: number;
+}
+
+let userScores: UserScore[] = [];
+
+let firstPlace: UserScore;
+let fsecondPlace: UserScore;
+let thirdPlace: UserScore;
+
+for (let i = 0; i < 3; i += 1) {
+  const storedValue = localStorage.getItem(`${i}`);
+
+  if (storedValue !== null) {
+    const dataFromStorage: string = storedValue;
+    const parsedData = JSON.parse(dataFromStorage);
+
+    if (typeof parsedData === "object" && parsedData !== null) {
+      userScores.push(parsedData);
+    }
+  }
+}
+
+// const userScores: UserScore[] = [
+//   { place: 1, userName: "John", score: 99 },
+//   { place: 2, userName: "Kate", score: 45 },
+//   { place: 3, userName: "Takeshi", score: 12 },
+// ];
+
+// console.log(JSON.stringify(userScores[0]));
+
 let isPaused = false;
 
 function pause() {

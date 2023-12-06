@@ -9,6 +9,26 @@ var gameOver = false;
 var score = 0;
 var lines = 0;
 var maxScore = 0;
+var userScores = [];
+var firstPlace;
+var fsecondPlace;
+var thirdPlace;
+for (var i = 0; i < 3; i += 1) {
+    var storedValue = localStorage.getItem("" + i);
+    if (storedValue !== null) {
+        var dataFromStorage = storedValue;
+        var parsedData = JSON.parse(dataFromStorage);
+        if (typeof parsedData === "object" && parsedData !== null) {
+            userScores.push(parsedData);
+        }
+    }
+}
+// const userScores: UserScore[] = [
+//   { place: 1, userName: "John", score: 99 },
+//   { place: 2, userName: "Kate", score: 45 },
+//   { place: 3, userName: "Takeshi", score: 12 },
+// ];
+// console.log(JSON.stringify(userScores[0]));
 var isPaused = false;
 function pause() {
     if (!isPaused) {
