@@ -24,32 +24,31 @@ interface UserScore {
   score: number;
 }
 
-let userScores: UserScore[] = [];
-
-let firstPlace: UserScore;
-let fsecondPlace: UserScore;
-let thirdPlace: UserScore;
+let usersScores: UserScore[] = [];
 
 for (let i = 0; i < 3; i += 1) {
-  const storedValue = localStorage.getItem(`${i}`);
+  const storedValue = localStorage.getItem(`${i + 1}`);
+  console.log(storedValue);
 
   if (storedValue !== null) {
     const dataFromStorage: string = storedValue;
     const parsedData = JSON.parse(dataFromStorage);
 
     if (typeof parsedData === "object" && parsedData !== null) {
-      userScores.push(parsedData);
+      usersScores.push(parsedData);
+      console.log(usersScores);
+      let scoreToDisplay: Element | null = document.getElementById(`${i + 1}`);
+      console.log(scoreToDisplay);
+
+      if (scoreToDisplay !== null) {
+        let userNameToDisplay: string = usersScores[i].userName;
+        let userScoreToDisplay: number = usersScores[i].score;
+        let placeTodisplay;
+        scoreToDisplay.innerHTML = `${userNameToDisplay} : ${userScoreToDisplay}`;
+      }
     }
   }
 }
-
-// const userScores: UserScore[] = [
-//   { place: 1, userName: "John", score: 99 },
-//   { place: 2, userName: "Kate", score: 45 },
-//   { place: 3, userName: "Takeshi", score: 12 },
-// ];
-
-// console.log(JSON.stringify(userScores[0]));
 
 let isPaused = false;
 
@@ -59,7 +58,6 @@ function pause() {
     console.log(isPaused);
   } else {
     isPaused = false;
-    console.log(isPaused);
   }
 }
 
@@ -69,8 +67,6 @@ function drawSquare(x, y, color) {
   ctx.strokeStyle = "black";
   ctx.strokeRect(x * SQ, y * SQ, SQ, SQ);
 }
-
-// drawSquare(1, 1, color);
 
 let board: string[][] = [];
 
@@ -100,8 +96,6 @@ function Piece(tetromino, color) {
   this.x = 2;
   this.y = -2;
 }
-
-// drawSquare(0, 0, color);
 
 const Z = [
   [
@@ -356,20 +350,33 @@ Piece.prototype.rotate = function () {
 
   if (this.collision(0, 0, nextPattern)) {
     if (!isPaused) {
-      if (this.x > gridColumns / 2) {
-        kick -= 1;
-      } else {
-        kick = 1;
+      kick = -1;
+
+      if (!this.collision(kick, 0, nextPattern)) {
+        this.unDraw();
+        this.x += kick;
+        this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length;
+        this.activeTetromino = this.tetromino[this.tetrominoN];
+        this.draw();
+        return;
+      }
+
+      kick = 1;
+
+      if (!this.collision(kick, 0, nextPattern)) {
+        this.unDraw();
+        this.x += kick;
+        this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length;
+        this.activeTetromino = this.tetromino[this.tetrominoN];
+        this.draw();
+        return;
       }
     }
-
-    if (!this.collision(0, 0, nextPattern)) {
-      this.unDraw();
-      this.x += kick;
-      this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length;
-      this.activeTetromino = this.tetromino[this.tetrominoN];
-      this.draw();
-    }
+  } else {
+    this.unDraw();
+    this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length;
+    this.activeTetromino = this.tetromino[this.tetrominoN];
+    this.draw();
   }
 };
 
@@ -411,6 +418,7 @@ function control(event: KeyboardEvent): void {
       dropStart = Date.now();
       break;
     case "ArrowUp":
+      // console.log("up");
       p.rotate();
       dropStart = Date.now();
       break;
@@ -480,6 +488,9 @@ Piece.prototype.lock = function () {
       }
       if (this.y + r < 0) {
         gameOver = true;
+
+        updateLeaderboard();
+
         alert("game over!");
         break;
       }
@@ -503,21 +514,49 @@ Piece.prototype.lock = function () {
       }
       score += 10;
       lines += 1;
-      // updateInfo();
+      updateScore();
     }
   }
   drawBoard();
 };
 
-// function updateInfo() {
-//   const currentScoreElement = document.getElementById("current_score");
-//   const linesElement = document.getElementById("lines");
+function updateScore() {
+  const currentScoreElement = document.getElementById("current_score");
+  const linesElement = document.getElementById("lines");
 
-//   if (currentScoreElement) {
-//     currentScoreElement.textContent = `current score: ${score}`;
-//   }
+  if (currentScoreElement) {
+    currentScoreElement.textContent = `current score: ${score}`;
+  }
 
-//   if (linesElement) {
-//     linesElement.textContent = `lines: ${lines}`;
-//   }
-// }
+  if (linesElement) {
+    linesElement.textContent = `lines: ${lines}`;
+  }
+}
+
+function updateLeaderboard() {
+  let userName = "";
+
+  if (usersScores.length === 0) {
+    userName = prompt("Please enter your name") || "";
+    const user = { place: 1, userName, score };
+    usersScores.push(user);
+    localStorage.setItem("1", JSON.stringify(usersScores[0]));
+    return;
+  }
+
+  if (!usersScores[2] || score > usersScores[2].score) {
+    userName = prompt("Please enter your name") || "";
+    usersScores[2] = { place: 3, userName, score };
+    localStorage.setItem("3", JSON.stringify(usersScores[2]));
+  }
+
+  if (!usersScores[1] || score > usersScores[1].score) {
+    usersScores[1] = { place: 2, userName, score };
+    localStorage.setItem("2", JSON.stringify(usersScores[1]));
+  }
+
+  if (!usersScores[0] || score > usersScores[0].score) {
+    usersScores[0] = { place: 1, userName, score };
+    localStorage.setItem("1", JSON.stringify(usersScores[0]));
+  }
+}

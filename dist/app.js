@@ -9,26 +9,27 @@ var gameOver = false;
 var score = 0;
 var lines = 0;
 var maxScore = 0;
-var userScores = [];
-var firstPlace;
-var fsecondPlace;
-var thirdPlace;
+var usersScores = [];
 for (var i = 0; i < 3; i += 1) {
-    var storedValue = localStorage.getItem("" + i);
+    var storedValue = localStorage.getItem("" + (i + 1));
+    console.log(storedValue);
     if (storedValue !== null) {
         var dataFromStorage = storedValue;
         var parsedData = JSON.parse(dataFromStorage);
         if (typeof parsedData === "object" && parsedData !== null) {
-            userScores.push(parsedData);
+            usersScores.push(parsedData);
+            console.log(usersScores);
+            var scoreToDisplay = document.getElementById("" + (i + 1));
+            console.log(scoreToDisplay);
+            if (scoreToDisplay !== null) {
+                var userNameToDisplay = usersScores[i].userName;
+                var userScoreToDisplay = usersScores[i].score;
+                var placeTodisplay = void 0;
+                scoreToDisplay.innerHTML = userNameToDisplay + " : " + userScoreToDisplay;
+            }
         }
     }
 }
-// const userScores: UserScore[] = [
-//   { place: 1, userName: "John", score: 99 },
-//   { place: 2, userName: "Kate", score: 45 },
-//   { place: 3, userName: "Takeshi", score: 12 },
-// ];
-// console.log(JSON.stringify(userScores[0]));
 var isPaused = false;
 function pause() {
     if (!isPaused) {
@@ -37,7 +38,6 @@ function pause() {
     }
     else {
         isPaused = false;
-        console.log(isPaused);
     }
 }
 function drawSquare(x, y, color) {
@@ -46,7 +46,6 @@ function drawSquare(x, y, color) {
     ctx.strokeStyle = "black";
     ctx.strokeRect(x * SQ, y * SQ, SQ, SQ);
 }
-// drawSquare(1, 1, color);
 var board = [];
 for (var r = 0; r < gridRows; r += 1) {
     board[r] = [];
@@ -70,7 +69,6 @@ function Piece(tetromino, color) {
     this.x = 2;
     this.y = -2;
 }
-// drawSquare(0, 0, color);
 var Z = [
     [
         [1, 1, 0],
@@ -307,20 +305,31 @@ Piece.prototype.rotate = function () {
     var kick = 0;
     if (this.collision(0, 0, nextPattern)) {
         if (!isPaused) {
-            if (this.x > gridColumns / 2) {
-                kick -= 1;
+            kick = -1;
+            if (!this.collision(kick, 0, nextPattern)) {
+                this.unDraw();
+                this.x += kick;
+                this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length;
+                this.activeTetromino = this.tetromino[this.tetrominoN];
+                this.draw();
+                return;
             }
-            else {
-                kick = 1;
+            kick = 1;
+            if (!this.collision(kick, 0, nextPattern)) {
+                this.unDraw();
+                this.x += kick;
+                this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length;
+                this.activeTetromino = this.tetromino[this.tetrominoN];
+                this.draw();
+                return;
             }
         }
-        if (!this.collision(0, 0, nextPattern)) {
-            this.unDraw();
-            this.x += kick;
-            this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length;
-            this.activeTetromino = this.tetromino[this.tetrominoN];
-            this.draw();
-        }
+    }
+    else {
+        this.unDraw();
+        this.tetrominoN = (this.tetrominoN + 1) % this.tetromino.length;
+        this.activeTetromino = this.tetromino[this.tetrominoN];
+        this.draw();
     }
 };
 Piece.prototype.collision = function (x, y, piece) {
@@ -353,6 +362,7 @@ function control(event) {
             dropStart = Date.now();
             break;
         case "ArrowUp":
+            // console.log("up");
             p.rotate();
             dropStart = Date.now();
             break;
@@ -413,6 +423,7 @@ Piece.prototype.lock = function () {
             }
             if (this.y + r < 0) {
                 gameOver = true;
+                updateLeaderboard();
                 alert("game over!");
                 break;
             }
@@ -435,18 +446,41 @@ Piece.prototype.lock = function () {
             }
             score += 10;
             lines += 1;
-            // updateInfo();
+            updateScore();
         }
     }
     drawBoard();
 };
-// function updateInfo() {
-//   const currentScoreElement = document.getElementById("current_score");
-//   const linesElement = document.getElementById("lines");
-//   if (currentScoreElement) {
-//     currentScoreElement.textContent = `current score: ${score}`;
-//   }
-//   if (linesElement) {
-//     linesElement.textContent = `lines: ${lines}`;
-//   }
-// }
+function updateScore() {
+    var currentScoreElement = document.getElementById("current_score");
+    var linesElement = document.getElementById("lines");
+    if (currentScoreElement) {
+        currentScoreElement.textContent = "current score: " + score;
+    }
+    if (linesElement) {
+        linesElement.textContent = "lines: " + lines;
+    }
+}
+function updateLeaderboard() {
+    var userName = "";
+    if (usersScores.length === 0) {
+        userName = prompt("Please enter your name") || "";
+        var user = { place: 1, userName: userName, score: score };
+        usersScores.push(user);
+        localStorage.setItem("1", JSON.stringify(usersScores[0]));
+        return;
+    }
+    if (!usersScores[2] || score > usersScores[2].score) {
+        userName = prompt("Please enter your name") || "";
+        usersScores[2] = { place: 3, userName: userName, score: score };
+        localStorage.setItem("3", JSON.stringify(usersScores[2]));
+    }
+    if (!usersScores[1] || score > usersScores[1].score) {
+        usersScores[1] = { place: 2, userName: userName, score: score };
+        localStorage.setItem("2", JSON.stringify(usersScores[1]));
+    }
+    if (!usersScores[0] || score > usersScores[0].score) {
+        usersScores[0] = { place: 1, userName: userName, score: score };
+        localStorage.setItem("1", JSON.stringify(usersScores[0]));
+    }
+}
