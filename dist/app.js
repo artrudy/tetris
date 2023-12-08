@@ -24,7 +24,7 @@ for (var i = 0; i < 3; i += 1) {
             if (scoreToDisplay !== null) {
                 var userNameToDisplay = usersScores[i].userName;
                 var userScoreToDisplay = usersScores[i].score;
-                var placeTodisplay = void 0;
+                // let placeTodisplay;
                 scoreToDisplay.innerHTML = userNameToDisplay + " : " + userScoreToDisplay;
             }
         }
@@ -467,20 +467,41 @@ function updateLeaderboard() {
         userName = prompt("Please enter your name") || "";
         var user = { place: 1, userName: userName, score: score };
         usersScores.push(user);
-        localStorage.setItem("1", JSON.stringify(usersScores[0]));
+        updateLocalStorageData();
         return;
     }
-    if (!usersScores[2] || score > usersScores[2].score) {
-        userName = prompt("Please enter your name") || "";
-        usersScores[2] = { place: 3, userName: userName, score: score };
-        localStorage.setItem("3", JSON.stringify(usersScores[2]));
+    else {
+        for (var i = 0; i < usersScores.length; i += 1) {
+            if (score > usersScores[i].score) {
+                console.log("if 1");
+                userName = prompt("Please enter your name") || "";
+                var user = { place: i + 1, userName: userName, score: score };
+                usersScores.splice(i, 0, user);
+                i += 5;
+                leaderBoardArrayLengthChecker();
+                updateLocalStorageData();
+            }
+            else if (score === usersScores[i].score) {
+                console.log("if 2");
+                userName = prompt("Please enter your name") || "";
+                var user = { place: i + 2, userName: userName, score: score };
+                usersScores.splice(i + 1, 0, user);
+                i += 5;
+                leaderBoardArrayLengthChecker();
+                updateLocalStorageData();
+            }
+        }
+        return;
     }
-    if (!usersScores[1] || score > usersScores[1].score) {
-        usersScores[1] = { place: 2, userName: userName, score: score };
-        localStorage.setItem("2", JSON.stringify(usersScores[1]));
+}
+function updateLocalStorageData() {
+    usersScores.forEach(function (it, index) {
+        localStorage.setItem("" + (index + 1), JSON.stringify(it));
+    });
+}
+function leaderBoardArrayLengthChecker() {
+    if (usersScores.length > 3) {
+        usersScores.splice(3);
     }
-    if (!usersScores[0] || score > usersScores[0].score) {
-        usersScores[0] = { place: 1, userName: userName, score: score };
-        localStorage.setItem("1", JSON.stringify(usersScores[0]));
-    }
+    return usersScores;
 }

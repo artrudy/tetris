@@ -43,7 +43,7 @@ for (let i = 0; i < 3; i += 1) {
       if (scoreToDisplay !== null) {
         let userNameToDisplay: string = usersScores[i].userName;
         let userScoreToDisplay: number = usersScores[i].score;
-        let placeTodisplay;
+        // let placeTodisplay;
         scoreToDisplay.innerHTML = `${userNameToDisplay} : ${userScoreToDisplay}`;
       }
     }
@@ -540,23 +540,42 @@ function updateLeaderboard() {
     userName = prompt("Please enter your name") || "";
     const user = { place: 1, userName, score };
     usersScores.push(user);
-    localStorage.setItem("1", JSON.stringify(usersScores[0]));
+    updateLocalStorageData();
+    return;
+  } else {
+    for (let i = 0; i < usersScores.length; i += 1) {
+      if (score > usersScores[i].score) {
+        console.log("if 1");
+        userName = prompt("Please enter your name") || "";
+        const user = { place: i + 1, userName, score };
+        usersScores.splice(i, 0, user);
+        i += 5;
+        leaderBoardArrayLengthChecker();
+        updateLocalStorageData();
+      } else if (score === usersScores[i].score) {
+        console.log("if 2");
+        userName = prompt("Please enter your name") || "";
+        const user = { place: i + 2, userName, score };
+        usersScores.splice(i + 1, 0, user);
+        i += 5;
+
+        leaderBoardArrayLengthChecker();
+        updateLocalStorageData();
+      }
+    }
     return;
   }
+}
 
-  if (!usersScores[2] || score > usersScores[2].score) {
-    userName = prompt("Please enter your name") || "";
-    usersScores[2] = { place: 3, userName, score };
-    localStorage.setItem("3", JSON.stringify(usersScores[2]));
-  }
+function updateLocalStorageData(): void {
+  usersScores.forEach((it, index) => {
+    localStorage.setItem(`${index + 1}`, JSON.stringify(it));
+  });
+}
 
-  if (!usersScores[1] || score > usersScores[1].score) {
-    usersScores[1] = { place: 2, userName, score };
-    localStorage.setItem("2", JSON.stringify(usersScores[1]));
+function leaderBoardArrayLengthChecker(): UserScore[] {
+  if (usersScores.length > 3) {
+    usersScores.splice(3);
   }
-
-  if (!usersScores[0] || score > usersScores[0].score) {
-    usersScores[0] = { place: 1, userName, score };
-    localStorage.setItem("1", JSON.stringify(usersScores[0]));
-  }
+  return usersScores;
 }
