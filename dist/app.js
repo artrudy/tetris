@@ -12,15 +12,12 @@ var maxScore = 0;
 var usersScores = [];
 for (var i = 0; i < 3; i += 1) {
     var storedValue = localStorage.getItem("" + (i + 1));
-    console.log(storedValue);
     if (storedValue !== null) {
         var dataFromStorage = storedValue;
         var parsedData = JSON.parse(dataFromStorage);
         if (typeof parsedData === "object" && parsedData !== null) {
             usersScores.push(parsedData);
-            console.log(usersScores);
             var scoreToDisplay = document.getElementById("" + (i + 1));
-            console.log(scoreToDisplay);
             if (scoreToDisplay !== null) {
                 var userNameToDisplay = usersScores[i].userName;
                 var userScoreToDisplay = usersScores[i].score;
@@ -34,7 +31,6 @@ var isPaused = false;
 function pause() {
     if (!isPaused) {
         isPaused = true;
-        console.log(isPaused);
     }
     else {
         isPaused = false;
@@ -362,7 +358,6 @@ function control(event) {
             dropStart = Date.now();
             break;
         case "ArrowUp":
-            // console.log("up");
             p.rotate();
             dropStart = Date.now();
             break;

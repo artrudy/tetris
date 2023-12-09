@@ -27,7 +27,6 @@ let usersScores: UserScore[] = [];
 
 for (let i = 0; i < 3; i += 1) {
   const storedValue = localStorage.getItem(`${i + 1}`);
-  console.log(storedValue);
 
   if (storedValue !== null) {
     const dataFromStorage: string = storedValue;
@@ -35,9 +34,7 @@ for (let i = 0; i < 3; i += 1) {
 
     if (typeof parsedData === "object" && parsedData !== null) {
       usersScores.push(parsedData);
-      console.log(usersScores);
       let scoreToDisplay: Element | null = document.getElementById(`${i + 1}`);
-      console.log(scoreToDisplay);
 
       if (scoreToDisplay !== null) {
         let userNameToDisplay: string = usersScores[i].userName;
@@ -54,7 +51,6 @@ let isPaused = false;
 function pause() {
   if (!isPaused) {
     isPaused = true;
-    console.log(isPaused);
   } else {
     isPaused = false;
   }
@@ -417,7 +413,6 @@ function control(event: KeyboardEvent): void {
       dropStart = Date.now();
       break;
     case "ArrowUp":
-      // console.log("up");
       p.rotate();
       dropStart = Date.now();
       break;
