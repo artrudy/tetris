@@ -463,34 +463,53 @@ function updateScore() {
 }
 function updateLeaderboard() {
     var userName = "";
-    if (usersScores.length === 0) {
+    var dataWaschanged = false;
+    if (usersScores.length === 0 && !dataWaschanged) {
+        dataWaschanged = true;
         userName = prompt("Please enter your name") || "";
-        var user = { place: 1, userName: userName, score: score };
+        var user = { userName: userName, score: score };
         usersScores.push(user);
         updateLocalStorageData();
         return;
     }
-    else {
-        for (var i = 0; i < usersScores.length; i += 1) {
-            if (score > usersScores[i].score) {
-                console.log("if 1");
-                userName = prompt("Please enter your name") || "";
-                var user = { place: i + 1, userName: userName, score: score };
-                usersScores.splice(i, 0, user);
-                i += 5;
-                leaderBoardArrayLengthChecker();
-                updateLocalStorageData();
-            }
-            else if (score === usersScores[i].score) {
-                console.log("if 2");
-                userName = prompt("Please enter your name") || "";
-                var user = { place: i + 2, userName: userName, score: score };
-                usersScores.splice(i + 1, 0, user);
-                i += 5;
-                leaderBoardArrayLengthChecker();
-                updateLocalStorageData();
-            }
-        }
+    if (usersScores[0] && score === usersScores[0].score) {
+        userName = prompt("Please enter your name") || "";
+        var user = { userName: userName, score: score };
+        usersScores.splice(1, 0, user);
+        leaderBoardArrayLengthChecker();
+        updateLocalStorageData();
+        return;
+    }
+    if (usersScores[1] && score === usersScores[1].score) {
+        userName = prompt("Please enter your name") || "";
+        var user = { userName: userName, score: score };
+        usersScores.splice(2, 0, user);
+        leaderBoardArrayLengthChecker();
+        updateLocalStorageData();
+        return;
+    }
+    if (usersScores[2] && score > usersScores[2].score) {
+        userName = prompt("Please enter your name") || "";
+        var user = { userName: userName, score: score };
+        usersScores.splice(2, 0, user);
+        leaderBoardArrayLengthChecker();
+        updateLocalStorageData();
+        return;
+    }
+    if (usersScores[1] && score > usersScores[1].score) {
+        userName = prompt("Please enter your name") || "";
+        var user = { userName: userName, score: score };
+        usersScores.splice(1, 0, user);
+        leaderBoardArrayLengthChecker();
+        updateLocalStorageData();
+        return;
+    }
+    if (usersScores[0] && score > usersScores[0].score) {
+        userName = prompt("Please enter your name") || "";
+        var user = { userName: userName, score: score };
+        usersScores.splice(0, 0, user);
+        leaderBoardArrayLengthChecker();
+        updateLocalStorageData();
         return;
     }
 }

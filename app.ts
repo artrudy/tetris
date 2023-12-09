@@ -19,7 +19,6 @@ let lines = 0;
 let maxScore = 0;
 
 interface UserScore {
-  place: number;
   userName: string;
   score: number;
 }
@@ -535,34 +534,64 @@ function updateScore() {
 
 function updateLeaderboard() {
   let userName = "";
+  let dataWaschanged = false;
 
-  if (usersScores.length === 0) {
+  if (usersScores.length === 0 && !dataWaschanged) {
+    dataWaschanged = true;
+
     userName = prompt("Please enter your name") || "";
-    const user = { place: 1, userName, score };
+    const user = { userName, score };
     usersScores.push(user);
     updateLocalStorageData();
     return;
-  } else {
-    for (let i = 0; i < usersScores.length; i += 1) {
-      if (score > usersScores[i].score) {
-        console.log("if 1");
-        userName = prompt("Please enter your name") || "";
-        const user = { place: i + 1, userName, score };
-        usersScores.splice(i, 0, user);
-        i += 5;
-        leaderBoardArrayLengthChecker();
-        updateLocalStorageData();
-      } else if (score === usersScores[i].score) {
-        console.log("if 2");
-        userName = prompt("Please enter your name") || "";
-        const user = { place: i + 2, userName, score };
-        usersScores.splice(i + 1, 0, user);
-        i += 5;
+  }
 
-        leaderBoardArrayLengthChecker();
-        updateLocalStorageData();
-      }
-    }
+  if (usersScores[0] && score === usersScores[0].score) {
+    userName = prompt("Please enter your name") || "";
+    const user = { userName, score };
+    usersScores.splice(1, 0, user);
+
+    leaderBoardArrayLengthChecker();
+    updateLocalStorageData();
+    return;
+  }
+
+  if (usersScores[1] && score === usersScores[1].score) {
+    userName = prompt("Please enter your name") || "";
+    const user = { userName, score };
+    usersScores.splice(2, 0, user);
+
+    leaderBoardArrayLengthChecker();
+    updateLocalStorageData();
+    return;
+  }
+  if (usersScores[2] && score > usersScores[2].score) {
+    userName = prompt("Please enter your name") || "";
+    const user = { userName, score };
+    usersScores.splice(2, 0, user);
+
+    leaderBoardArrayLengthChecker();
+    updateLocalStorageData();
+    return;
+  }
+
+  if (usersScores[1] && score > usersScores[1].score) {
+    userName = prompt("Please enter your name") || "";
+    const user = { userName, score };
+    usersScores.splice(1, 0, user);
+
+    leaderBoardArrayLengthChecker();
+    updateLocalStorageData();
+    return;
+  }
+
+  if (usersScores[0] && score > usersScores[0].score) {
+    userName = prompt("Please enter your name") || "";
+    const user = { userName, score };
+    usersScores.splice(0, 0, user);
+
+    leaderBoardArrayLengthChecker();
+    updateLocalStorageData();
     return;
   }
 }
